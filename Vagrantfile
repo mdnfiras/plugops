@@ -5,11 +5,11 @@ mainscript = "initscripts/mainkubeinstall.sh"
 workerscript = "initscripts/workerkubeinstall.sh"
 
 nodes = [
-		{:hostname => "node1", :ip => "192.168.5.11", :cpus => 2, :mem => 3072, :script => workerscript},
+		{:hostname => "node1", :ip => "192.168.5.11", :cpus => 4, :mem => 3072, :script => workerscript},
 	
-		{:hostname => "node2", :ip => "192.168.5.12", :cpus => 2, :mem => 3072, :script => workerscript},
+		{:hostname => "node2", :ip => "192.168.5.12", :cpus => 4, :mem => 3072, :script => workerscript},
 
-		{:hostname => "main", :ip => "192.168.5.10", :cpus => 2, :mem => 3072, :script => mainscript}
+		{:hostname => "main", :ip => "192.168.5.10", :cpus => 4, :mem => 3072, :script => mainscript}
 	]
 
 
@@ -20,8 +20,8 @@ Vagrant.configure(2) do |config|
 			config.vm.box = "peru/ubuntu-18.04-server-amd64"
 			config.vm.box_check_update = false
 			wmachine.vm.hostname = node[:hostname]
-			wmachine.vm.network :private_network, :ip => node[:ip]
-			#config.vm.network :public_network, :bridge => "eth0", :dev => "eth0", :mode => "bridge", :type => "bridge"
+			wmachine.vm.network "forwarded_port", guest: 1194, host: 1194, protocol: "udp"
+			wmachine.vm.network "private_network", ip: node[:ip]
 			wmachine.vm.provider :libvirt do |domain|
 				domain.memory = node[:mem]
 				domain.cpus = node[:cpus]
