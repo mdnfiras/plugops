@@ -5,11 +5,11 @@ mainscript = "initscripts/mainkubeinstall.sh"
 workerscript = "initscripts/workerkubeinstall.sh"
 
 nodes = [
-		{:hostname => "node1", :ip => "192.168.5.11", :cpus => 2, :mem => 2048, :script => workerscript},
+		{:hostname => "node1", :ip => "192.168.5.11", :cpus => 2, :mem => 3072, :script => workerscript},
 	
-		{:hostname => "node2", :ip => "192.168.5.12", :cpus => 2, :mem => 2048, :script => workerscript},
+		{:hostname => "node2", :ip => "192.168.5.12", :cpus => 2, :mem => 3072, :script => workerscript},
 
-		{:hostname => "main", :ip => "192.168.5.10", :cpus => 2, :mem => 2048, :script => mainscript}
+		{:hostname => "main", :ip => "192.168.5.10", :cpus => 2, :mem => 3072, :script => mainscript}
 	]
 
 
