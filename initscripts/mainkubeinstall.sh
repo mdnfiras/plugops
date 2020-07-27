@@ -1,0 +1,81 @@
+#!/bin/bash
+echo "=======> disabeling swap :"
+swapoff -a
+
+echo "=======> updating repos :"
+apt update
+echo "=======> installing curl, gnupg & software-properties-common :"
+apt -y install curl gnupg software-properties-common
+echo "=======> updating repos :"
+apt update
+echo "=======> installing docker.io :"
+apt -y install docker.io
+echo "=======> starting docker :"
+systemctl start docker
+echo "=======> enabeling docker :"
+systemctl enable docker
+echo "=======> checking docker status :"
+systemctl status docker | head -3 | tail -1
+
+echo "=======> adding kubernetes repo :"
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+echo "=======> updating repos :"
+apt update
+echo "=======> installing kubeadm, kubelet, kubectl & kubernetes-cni :"
+apt -y install kubeadm kubelet kubectl kubernetes-cni
+
+echo "=======> setting hostname to main :"
+hostnamectl set-hostname main
+
+echo "=======> initializing kubeadm :"
+kubeadm init --apiserver-advertise-address 192.168.5.10
+
+echo "=======> copying config file :"
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+
+echo "=======> adding calico networking solution :"
+kubectl apply -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
+
+echo "=======> checking pods status :"
+kubectl get pods --all-namespaces
+
+echo "=======> generating kubejoin.sh :"
+printf %"s\n" \
+"swapoff -a" \
+"echo y | kubeadm reset" \
+"systemctl restart kubelet" \
+"`kubeadm token create --print-join-command`" \
+"echo \"kubelet status\" :" \
+"systemctl status kubelet | head -5 | tail -1"> kubejoin.sh
+
+echo "=======> kubejoin.sh content :"
+cat kubejoin.sh
+
+echo "=======> installing nginx to publish kubejoin.sh to worker nodes :"
+apt install -y nginx
+cat kubejoin.sh > /var/www/html/kubejoin.sh
+
+echo "=======> purging nginx :"
+while [[ `kubectl get nodes | tr -s ' ' | cut -d ' ' -f 2 | sed 1,1d | grep "^Ready" | wc -l` != 3 ]]; do sleep 5; done
+apt purge nginx
+
+echo "=======> installing helm :"
+curl https://helm.baltorepo.com/organization/signing.asc | sudo apt-key add -
+apt install apt-transport-https --yes
+echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+apt update
+apt install -y helm
+
+echo "=======> installing jenkins :"
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
+helm repo update
+wget https://raw.githubusercontent.com/helm/charts/master/stable/jenkins/values.yaml
+helm install cd-jenkins -f values.yaml stable/jenkins --version 1.2.2
+
+echo "=======> installing nginx-ingress-controller :"
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.34.1/deploy/static/provider/baremetal/deploy.yaml
+kubectl apply -f https://raw.githubusercontent.com/mdnfiras/devops/nginx-ingress-controller/nginx-ingress-controller.yaml
+
