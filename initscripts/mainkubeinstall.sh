@@ -77,5 +77,5 @@ helm install cd-jenkins -f values.yaml stable/jenkins --version 1.2.2
 
 echo "=======> installing nginx-ingress-controller :"
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.34.1/deploy/static/provider/baremetal/deploy.yaml
-kubectl apply -f https://raw.githubusercontent.com/mdnfiras/devops/nginx-ingress-controller/nginx-ingress-controller.yaml
+kubectl apply -f https://raw.githubusercontent.com/mdnfiras/devops-infra/master/nginx-ingress-controller/nginx-ingress-controller.yaml
 
