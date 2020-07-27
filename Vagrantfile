@@ -1,8 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby:
 
-mainscript = "initscript/mainkubeinstall.sh"
-workerscript = "initscript/workerkubeinstall.sh"
+mainscript = "initscripts/mainkubeinstall.sh"
+workerscript = "initscripts/workerkubeinstall.sh"
 
 nodes = [
 		{:hostname => "node1", :ip => "192.168.5.11", :cpus => 2, :mem => 2048, :script => workerscript},
