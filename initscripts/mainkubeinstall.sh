@@ -58,9 +58,8 @@ echo "=======> installing nginx to publish kubejoin.sh to worker nodes :"
 apt install -y nginx
 cat kubejoin.sh > /var/www/html/kubejoin.sh
 
-echo "=======> purging nginx :"
-while [[ `kubectl get nodes | tr -s ' ' | cut -d ' ' -f 2 | sed 1,1d | grep "^Ready" | wc -l` != 3 ]]; do sleep 5; done
-apt purge nginx
+echo "=======> waiting for at least one worker to join the cluster :"
+while [[ `kubectl get nodes | tr -s ' ' | cut -d ' ' -f 2 | sed 1,1d | grep "^Ready" | wc -l` -lt 2 ]]; do sleep 5; done
 
 echo "=======> installing helm :"
 curl https://helm.baltorepo.com/organization/signing.asc | sudo apt-key add -
