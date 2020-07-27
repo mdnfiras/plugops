@@ -72,8 +72,8 @@ apt install -y helm
 echo "=======> installing jenkins :"
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 helm repo update
-wget https://raw.githubusercontent.com/helm/charts/master/stable/jenkins/values.yaml
-helm install cd-jenkins -f values.yaml stable/jenkins --version 1.2.2
+wget https://raw.githubusercontent.com/mdnfiras/devops-infra/master/jenkins/jenkins-values.yaml
+helm install cd-jenkins -f jenkins-values.yaml stable/jenkins --version 1.2.2
 
 echo "=======> installing nginx-ingress-controller :"
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.34.1/deploy/static/provider/baremetal/deploy.yaml
