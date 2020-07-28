@@ -29,7 +29,7 @@ echo "=======> setting hostname to main :"
 hostnamectl set-hostname main
 
 echo "=======> initializing kubeadm :"
-kubeadm init --apiserver-advertise-address 192.168.5.10
+kubeadm init
 
 echo "=======> copying config file :"
 mkdir -p $HOME/.kube
@@ -39,9 +39,6 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 echo "=======> adding calico networking solution :"
 kubectl apply -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
 
-echo "=======> checking pods status :"
-kubectl get pods --all-namespaces
-
 echo "=======> generating kubejoin.sh :"
 printf %"s\n" \
 "swapoff -a" \
@@ -50,9 +47,6 @@ printf %"s\n" \
 "`kubeadm token create --print-join-command`" \
 "echo \"kubelet status\" :" \
 "systemctl status kubelet | head -5 | tail -1"> kubejoin.sh
-
-echo "=======> kubejoin.sh content :"
-cat kubejoin.sh
 
 echo "=======> installing nginx to publish kubejoin.sh to worker nodes :"
 apt install -y nginx
