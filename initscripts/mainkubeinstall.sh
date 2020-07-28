@@ -68,3 +68,7 @@ helm repo update
 wget https://raw.githubusercontent.com/mdnfiras/devops-infra/master/jenkins/jenkins-values.yaml
 helm install cd-jenkins -f jenkins-values.yaml stable/jenkins --version 1.2.2
 
+echo "=======> adding NodePort for Jenkins:"
+wget https://raw.githubusercontent.com/mdnfiras/devops-infra/master/jenkins/jenkins-nodeport.yaml
+kubectl apply -f jenkins-nodeport.yaml
+
