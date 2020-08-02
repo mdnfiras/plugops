@@ -20,7 +20,6 @@ Vagrant.configure(2) do |config|
 			config.vm.box = "peru/ubuntu-18.04-server-amd64"
 			config.vm.box_check_update = false
 			wmachine.vm.hostname = node[:hostname]
-			wmachine.vm.network "forwarded_port", guest: 1194, host: 1194, protocol: "udp"
 			wmachine.vm.network "private_network", ip: node[:ip]
 			wmachine.vm.provider :libvirt do |domain|
 				domain.memory = node[:mem]
