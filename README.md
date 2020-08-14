@@ -13,7 +13,7 @@ git clone https://github.com/mdnfiras/devops-infra.git
 Change directory.
 
 ```bash
-cd ovpn
+cd devops-infra
 ```
 
 Install Vagrant on the host server along with all the required packages and plugins (KVM & LibVirt).
@@ -26,7 +26,7 @@ sudo ./vagrantinstall.sh
 
 # Usage
 
-Start the Vagrant ovpn virtual machine, provision it to install k8s on all the nodes, k8s control plane on the main node, join nodes, deploy Jenkins along with a NodePort service that will expose Jenkins' web interface on <any_node_ip>:30001
+Start the Vagrant virtual machines, provision it to install k8s on all the nodes, k8s control plane on the main node, join nodes, deploy Jenkins along with a NodePort service that will expose Jenkins' web interface on <any_node_ip>:30001
 
 ```bash
 sudo vagrant up --provider libvirt
