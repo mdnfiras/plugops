@@ -16,7 +16,7 @@ DOMAIN=$1
 
 if [ -d run ]
 then
-    rm -r run
+    ./cleanup.sh
 fi
 mkdir run
 cp -r dns run/dns
@@ -53,18 +53,20 @@ vagrant up --provider libvirt | tee nfs.logs
 
 echo "=======> waiting for NFS server to be ready :"
 curl 192.168.5.5:2049
-if [[ ! $? -eq 52 ]]; do
-    echo "=======> NFS server not working";
-done
+if [[ ! $? -eq 52 ]]
+then
+    echo "=======> NFS server not working"
+fi
 
 cd ../vpn
 vagrant up --provider libvirt | tee vpn.logs
 
 echo "=======> waiting for NFS server to be ready :"
 curl 192.168.5.7:1194
-if [[ ! $? -eq 52 ]]; do
+if [[ ! $? -eq 52 ]]
+then
     echo "=======> NFS server not working";
-done
+fi
 
 cd ../worker
 vagrant up --provider libvirt > logs &
