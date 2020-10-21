@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp-ingress
+spec:
+  tls:
+  - hosts:
+    - myapp.devops.[[DOMAIN]]
+    secretName: devops-secret-tls
+  rules:
+  - host: myapp.devops.[[DOMAIN]]
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp-service
+            port:
+              number: 8080
