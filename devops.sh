@@ -14,6 +14,10 @@ fi
 
 DOMAIN=$1
 
+if [ -d run ]
+then
+    rm -r run
+fi
 mkdir run
 cp -r dns run/dns
 cp -r nfs run/nfs
