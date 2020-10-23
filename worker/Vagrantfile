@@ -4,11 +4,7 @@
 initscript = "initscripts/workerkubeinstall.sh"
 
 nodes = [
-#	... Define as much worker nodes as you want (do not exceed your system resources)
-#	{:hostname => "node4", :ip => "192.168.5.14", :cpus => 2, :mem => 2048, :script => initscript},
-#	{:hostname => "node3", :ip => "192.168.5.13", :cpus => 2, :mem => 2048, :script => initscript},
-#	{:hostname => "node2", :ip => "192.168.5.12", :cpus => 2, :mem => 2048, :script => initscript},
-	{:hostname => "node1", :ip => "192.168.5.11", :cpus => 2, :mem => 3072, :script => initscript}
+	{:hostname => "worker[[WORKER_N]]", :ip => "192.168.5.[[WORKER_IP]]", :cpus => 2, :mem => 3072, :script => initscript}
 ]
 
 

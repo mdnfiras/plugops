@@ -34,11 +34,21 @@ then
     cd ../..
 fi
 
-if [[ ! -z "$(virsh list --all | grep worker_node1 )" ]]
-then
-    cd run/worker
+while [[ ! -z "$(virsh list --all | grep worker )" ]]
+do
+    WORKER=$(virsh list --all | grep worker | tr -s ' ' | cut -d ' ' -f3 | cut -d_ -f1 )
+    cd run/$WORKER
     vagrant destroy
     cd ../..
-fi
+done
 
-rm -r run
+while true; do
+    read -p "Do you wish to remove the run folder?" yn
+    case $yn in
+        [Yy]* ) rm -r run; break;;
+        [Nn]* ) break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+
