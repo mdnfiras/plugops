@@ -20,8 +20,8 @@ Install Vagrant on the host server along with all the required packages and plug
 
 
 ```bash
-sudo chmod u=x vagrantinstall.sh
-sudo ./vagrantinstall.sh
+sudo chmod u=x requirements.sh
+sudo ./requirements.sh
 ```
 
 # Usage
