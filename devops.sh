@@ -52,7 +52,8 @@ do
     cp -r worker run/worker$i
 done
 
-sed -i "s/\[\[DOMAIN\]\]/$DOMAIN/g" run/dns/initscripts/dnsinstall.sh
+sed -i "s/\[\[DOMAIN\]\]/$DOMAIN/g" run/dns/initscripts/ansible-dns.yaml
+sed -i "s/\[\[DOMAIN\]\]/$DOMAIN/g" run/dns/initscripts/test-dns.sh
 sed -i "s/\[\[DOMAIN\]\]/$DOMAIN/g" run/main/initscripts/mainkubeinstall.sh
 sed -i "s/\[\[DOMAIN\]\]/$DOMAIN/g" run/main/jenkins/jenkins-ingress.yaml
 sed -i "s/\[\[DOMAIN\]\]/$DOMAIN/g" run/main/jenkins/jenkins-pv.yaml
@@ -66,7 +67,7 @@ do
 done
 
 cd run
-exit
+
 echo "Running DNS server..."
 cd dns
 vagrant up --provider libvirt > dns.logs
@@ -77,7 +78,7 @@ echo "Running NFS server..."
 cd nfs
 vagrant up --provider libvirt > nfs.logs
 cd ..
-
+exit
 
 echo "Running VPN server..."
 cd vpn

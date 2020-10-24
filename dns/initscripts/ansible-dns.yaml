@@ -1,0 +1,135 @@
+- hosts: dns
+  vars:
+    domain: [[DOMAIN]]
+  
+  tasks:
+    - name: Install bind9
+      apt:
+        name: bind9
+        update_cache: yes
+      become: yes
+    
+    - name: Install dnsutils
+      apt:
+        name: dnsutils
+      become: yes
+
+    - name: Configure forwarders
+      copy:
+        content: |
+          options {
+            forwarders {
+              8.8.8.8;
+              8.8.4.4;
+              1.1.1.1;
+            };
+          };
+        dest: /etc/bind/named.conf.options
+        force: yes
+        group: sys
+        owner: root
+        mode: 0644
+      become: yes
+
+    - name: Override zone file
+      copy:
+        content: |
+          zone "{{ domain }}" {
+            type master;
+            file "/etc/bind/db.{{ domain }}";
+          };
+          zone "5.168.192.in-addr.arpa" {
+            type master;
+            file "/etc/bind/db.192";
+          };
+        dest: /etc/bind/named.conf.local
+        force: yes
+        group: sys
+        owner: root
+        mode: 0644
+      become: yes
+    
+    - name: Override forward zone file
+      copy:
+        content: |
+          ;
+          ; BIND data file for {{ domain }}
+          ;
+          $TTL    604800
+          @       IN      SOA     {{ domain }}. root.{{ domain }}. (
+                                        2         ; Serial
+                                  604800         ; Refresh
+                                    86400         ; Retry
+                                  2419200         ; Expire
+                                  604800 )       ; Negative Cache TTL
+          @       IN      NS      ns.{{ domain }}.
+          ns      IN      A       192.168.5.3
+          ; your sites
+          *.devops        IN      A       192.168.5.100
+          devops  IN      A       192.168.5.10
+          nfs     IN      A       192.168.5.5
+          vpn     IN      A       192.168.5.7
+        dest: /etc/bind/db.{{ domain }}
+        force: yes
+        group: sys
+        owner: root
+        mode: 0644
+      become: yes
+
+    - name: Override reverse zone file
+      copy:
+        content: |
+          ;
+          ; BIND reverse data file for local 192.168.5.X net
+          ;
+          $TTL    604800
+          @       IN      SOA     {{ domain }}. root.{{ domain }}. (
+                                        1         ; Serial
+                                  604800         ; Refresh
+                                    86400         ; Retry
+                                  2419200         ; Expire
+                                  604800 )       ; Negative Cache TTL
+          ;
+          @       IN      NS      ns.
+          3       IN      PTR     ns.{{ domain }}.
+          100     IN      PTR     *.devops.{{ domain }}.
+          10      IN      PTR     devops.{{ domain }}.
+          5       IN      PTR     nfs.{{ domain }}.
+          7       IN      PTR     vpn.{{ domain }}.
+        dest: /etc/bind/db.192
+        force: yes
+        group: sys
+        owner: root
+        mode: 0644
+      become: yes
+
+    - name: Restart bind9
+      systemd:
+        name: bind9
+        state: restarted
+        enabled: yes
+      become: yes
+
+    - name: Install resolvconf
+      apt:
+        name: resolvconf
+      become: yes
+    
+    - name: Start and enable resolvconf
+      systemd:
+        name: resolvconf.service
+        state: started
+        enabled: yes
+      become: yes
+
+    - name: Setup DNS
+      lineinfile:
+        path: /etc/resolvconf/resolv.conf.d/head
+        line: nameserver 192.168.5.3
+      become: yes
+
+    - name: Restart resolvconf
+      systemd:
+        name: resolvconf.service
+        state: restarted
+      become: yes
