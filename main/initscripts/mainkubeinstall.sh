@@ -53,12 +53,21 @@ printf %"s\n" \
 "echo \"kubelet status\" :" \
 "systemctl status kubelet | head -5 | tail -1"> kubejoin.sh
 
-echo "=======> installing nginx to publish kubejoin.sh to worker nodes :"
-apt install -y nginx
-cat kubejoin.sh > /var/www/html/kubejoin.sh
-
 echo "=======> installing package for NFS client :"
 apt install -y nfs-common
+
+echo "=======> waiting for DNS and NFS servers to be ready :"
+while [[ -z "$(ping nfs.[[DOMAIN]] -c 1 | grep 0% )" ]]; do sleep 5; done
+
+echo "=======> mounting via NFS :"
+mkdir -p /mnt/nfs_k8s
+mount nfs.[[DOMAIN]]:/mnt/nfs_share /mnt/nfs_k8s
+
+echo "=======> sharing kubejoin.sh to worker nodes via NFS :"
+mkdir -p /mnt/nfs_k8s/kubejoin
+chmod ugo=rwx /mnt/nfs_k8s/kubejoin
+cp kubejoin.sh /mnt/nfs_k8s/kubejoin/kubejoin.sh
+chmod ugo=r /mnt/nfs_k8s/kubejoin/kubejoin.sh
 
 echo "=======> waiting for at least one worker to join the cluster :"
 while [[ `kubectl get nodes | tr -s ' ' | cut -d ' ' -f 2 | sed 1,1d | grep "^Ready" | wc -l` -lt 2 ]]; do sleep 5; done
@@ -74,17 +83,6 @@ kubectl apply -f metallb/metallb-config.yaml
 echo "=======> [nginx-ingress] installing nginx ingress controller :"
 kubectl apply -f nginx-ingress-controller/nginx-ingress-deployment.yaml
 
-echo "=======> waiting for DNS and NFS servers to be ready :"
-while [[ -z "$(ping nfs.[[DOMAIN]] -c 1 | grep 0% )" ]]; do sleep 5; done
-
-echo "=======> mounting via NFS :"
-mkdir -p /mnt/nfs_k8s
-mount nfs.[[DOMAIN]]:/mnt/nfs_share /mnt/nfs_k8s
-
-echo "=======> [jenkins] preparing directory for persistent volume over NFS :"
-mkdir -p /mnt/nfs_k8s/jenkins
-chmod ugo=rwx /mnt/nfs_k8s/jenkins
-
 echo "=======> [nginx-ingress] waiting for nginx-ingress' create job to finish :"
 while [[ -z "`kubectl get pods -n ingress-nginx | grep create | grep Completed`" ]]; do sleep 5; done
 
@@ -99,6 +97,10 @@ while [[ -z "`kubectl get deployments -n ingress-nginx | grep "1/1"`" ]]; do sle
 
 echo "=======> [nginx-ingress] waiting for ingress-nginx-controller-admission service to run :"
 while [[ -z "`kubectl get services -n ingress-nginx | grep ingress-nginx-controller-admission`" ]]; do sleep 5; done
+
+echo "=======> [jenkins] preparing directory for persistent volume over NFS :"
+mkdir -p /mnt/nfs_k8s/jenkins
+chmod ugo=rwx /mnt/nfs_k8s/jenkins
 
 echo "=======> [jenkins] installing jenkins components :"
 kubectl apply -f jenkins/jenkins-pv.yaml

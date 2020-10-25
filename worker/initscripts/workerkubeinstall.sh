@@ -30,17 +30,24 @@ apt update
 echo "=======> installing kubeadm, kubelet, kubectl & kubernetes-cni :"
 apt -y install kubeadm kubelet kubectl kubernetes-cni
 
-echo "=======> waiting for main node and DNS server to be ready :"
-while [[ "$(curl -o /dev/null -u myself:XXXXXX -Isw '%{http_code}\n' http://devops.[[DOMAIN]]/kubejoin.sh)" != "200" ]]; do sleep 5 ; done
-
-echo "=======> downloading kubejoin.sh :"
-wget http://devops.[[DOMAIN]]/kubejoin.sh
-
-echo "=======> running kubejoin.sh :"
-chmod u=rx kubejoin.sh
-./kubejoin.sh
-
 echo "=======> installing package for NFS client :"
 apt install -y nfs-common
+
+echo "=======> waiting for NFS and DNS servers to be ready :"
+while [[ -z "$(showmount -e nfs.[[DOMAIN]] | grep /mnt/nfs_share/kubejoin )" ]]; do sleep 5 ; done
+
+echo "=======> mounting via NFS :"
+mkdir -p /mnt/nfs_k8s
+mount nfs.[[DOMAIN]]:/mnt/nfs_share /mnt/nfs_k8s
+
+echo "=======> waiting for kubejoin.sh to be ready on NFS server :"
+while [[ ! -f /mnt/nfs_k8s/kubejoin/kubejoin.sh ]]; do sleep 5 ; done
+
+echo "=======> downloading kubejoin.sh :"
+cp /mnt/nfs_k8s/kubejoin/kubejoin.sh kubejoin.sh
+
+echo "=======> running kubejoin.sh :"
+chmod u=x kubejoin.sh
+./kubejoin.sh
 
 echo "=======> finished !"
