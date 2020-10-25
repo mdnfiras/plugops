@@ -3,3 +3,4 @@ apt -y install qemu-kvm libvirt-bin ebtables dnsmasq-base libxslt-dev libxml2-de
 vagrant plugin install vagrant-libvirt
 apt-add-repository --yes --update ppa:ansible/ansible
 apt install ansible
+ansible-galaxy collection install community.general

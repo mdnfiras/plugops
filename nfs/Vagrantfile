@@ -1,26 +1,30 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby:
 
-nfsscript = "initscripts/nfsinstall.sh"
+provisionPath = "initscripts/ansible-nfs.yaml"
+testPath = "initscripts/test-nfs.sh"
 
 nodes = [
-	{:hostname => "nfs", :ip => "192.168.5.5", :cpus => 1, :mem => 512, :script => nfsscript}
+	{:hostname => "nfs", :ip => "192.168.5.5", :cpus => 1, :mem => 512, :provisionScript => provisionPath, :testScript => testPath}
 ]
 
 
 Vagrant.configure(2) do |config|
 	nodes.each do |node|
 		config.vm.define node[:hostname] do |vmachine|
-			config.vm.box_download_insecure = true
-			config.vm.box = "peru/ubuntu-18.04-server-amd64"
-			config.vm.box_check_update = false
+			vmachine.vm.box_download_insecure = true
+			vmachine.vm.box = "peru/ubuntu-18.04-server-amd64"
+			vmachine.vm.box_check_update = false
 			vmachine.vm.hostname = node[:hostname]
 			vmachine.vm.network "private_network", ip: node[:ip]
 			vmachine.vm.provider :libvirt do |domain|
 				domain.memory = node[:mem]
 				domain.cpus = node[:cpus]
 			end
-			vmachine.vm.provision :shell, path: node[:script]
+			vmachine.vm.provision :ansible do |ansible|
+    			ansible.playbook =  node[:provisionScript]
+			end
+			vmachine.vm.provision :shell, path: node[:testScript]
 		end
 	end
 end

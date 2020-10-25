@@ -1,0 +1,101 @@
+- hosts: nfs
+  vars:
+    domain: [[DOMAIN]]
+
+  tasks:
+    - name: Install nfs-common
+      apt:
+        name: nfs-common
+        update_cache: yes
+      become: yes
+    
+    - name: Install nfs-kernel-server
+      apt:
+        name: nfs-kernel-server
+      become: yes
+    
+    - name: Install resolvconf
+      apt:
+        name: resolvconf
+      become: yes
+    
+    - name: Start and enable resolvconf
+      systemd:
+        name: resolvconf.service
+        state: started
+        enabled: yes
+      become: yes
+
+    - name: Setup DNS
+      lineinfile:
+        path: /etc/resolvconf/resolv.conf.d/head
+        line: nameserver 192.168.5.3
+      become: yes
+
+    - name: Restart resolvconf
+      systemd:
+        name: resolvconf.service
+        state: restarted
+      become: yes
+
+    - name: Create directory to share
+      file:
+        path: /mnt/nfs_share
+        state: directory
+        force: yes
+        group: nogroup
+        owner: nobody
+        mode: 0777
+      become: yes
+    
+    - name: Share directory
+      lineinfile:
+        line: /mnt/nfs_share    192.168.5.0/24(rw,sync,no_subtree_check)
+        dest: /etc/exports
+        force: yes
+        group: sys
+        owner: root
+        mode: 0644
+      become: yes
+
+    - name: Reload NFS
+      command: 'exportfs -a'
+      become: yes
+
+    - name: Restart nfs-kernel-server
+      systemd:
+        name: nfs-kernel-server
+        state: restarted
+        enabled: yes
+      become: yes
+
+    - name: Enable firewall
+      community.general.ufw:
+        state: enabled
+      become: yes
+    
+    - name: Set logging
+      community.general.ufw:
+        logging: 'on'
+      become: yes
+
+    - name: Add firewall rule for NFS
+      community.general.ufw:
+        rule: allow
+        src: 192.168.5.0/24
+        proto: any
+        port: nfs
+      become: yes
+
+    - name: Add firewall rule for SSH
+      community.general.ufw:
+        rule: allow
+        src: 192.168.121.0/24
+        proto: any
+        port: ssh
+      become: yes
+    
+    - name: Reload firewall
+      community.general.ufw:
+        state: reloaded
+      become: yes

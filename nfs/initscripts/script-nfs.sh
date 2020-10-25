@@ -17,9 +17,6 @@ exportfs -a
 systemctl restart nfs-kernel-server
 
 printf "y\n" | ufw enable
-ufw status
 ufw allow from 192.168.5.0/24 to any port nfs
 ufw allow from 192.168.121.0/24 to any port ssh
 ufw reload
-ufw status
-
