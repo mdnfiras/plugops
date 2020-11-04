@@ -43,36 +43,6 @@ pipeline {
             }
         }
     }
-    
-    post {
-        success {
-            slackSend color: 'good',
-            message: """
-                Build ${env.BUILD_NUMBER} completed successfully for ${env.JOB_NAME}.
-                changes: <${env.RUN_CHANGES_DISPLAY_URL}|here>
-                Latest Commit: <${return_github_url().trim()}/commit/${env.GIT_COMMIT.trim()}|${env.GIT_LATEST_COMMIT_MESSAGE}>
-                with id: ${env.GIT_COMMIT}
-                ${env.GIT_SHORT_STAT}
-                ${env.GIT_LATEST_COMMIT_AUTHOR} authored and ${env.GIT_LATEST_COMMIT_EDITOR} committed
-                <${env.GIT_COMPARE_URL}|Compare against previous build>
-                More Details <${env.BUILD_URL}|here>
-			    """,
-			channel: "${params.SLACK_CHANNEL}"
-        }
-        failure {
-            slackSend color: 'danger',
-	    	message: """
-                Build ${env.BUILD_NUMBER} Failed for ${env.JOB_NAME}. 
-                changes: <${env.RUN_CHANGES_DISPLAY_URL}|here>
-                Latest commit: <${return_github_url().trim()}/commit/${env.GIT_COMMIT.trim()}|${env.GIT_LATEST_COMMIT_MESSAGE}>
-                ${env.GIT_SHORT_STAT}
-                ${env.GIT_LATEST_COMMIT_AUTHOR} authored and ${env.GIT_LATEST_COMMIT_EDITOR} committed
-                <${env.GIT_COMPARE_URL}|Compare against previous build>
-                More Details<${env.BUILD_URL}|here>
-			    """,
-			channel:"${params.SLACK_CHANNEL}"
-        }
-    }
 }
 
 def return_github_url() {
