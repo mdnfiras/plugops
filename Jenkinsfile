@@ -67,7 +67,7 @@ def get_previous_commit_id() {
                 commitId=$prevCommit
             fi
         fi
-    fi
+    fi 
     echo $commitId
     ''')
     return commit_id;
