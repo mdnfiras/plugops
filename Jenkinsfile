@@ -95,7 +95,7 @@ def get_previous_commit_id() {
                 commitId=$GIT_PREVIOUS_SUCCESSFUL_COMMIT
             else
                 commitId=$prevCommit
-            fi
+            fi 
         fi
     fi
     echo $commitId
