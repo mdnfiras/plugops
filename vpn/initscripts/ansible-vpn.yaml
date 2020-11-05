@@ -1,0 +1,43 @@
+- hosts: vpn
+  vars:
+    domain: [[DOMAIN]]
+  
+  tasks:
+    - name: Install resolvconf
+      apt:
+        name: resolvconf
+        update_cache: yes
+      become: yes
+    
+    - name: Start and enable resolvconf
+      systemd:
+        name: resolvconf.service
+        state: started
+        enabled: yes
+      become: yes
+
+    - name: Setup DNS
+      lineinfile:
+        path: /etc/resolvconf/resolv.conf.d/head
+        line: nameserver 192.168.5.3
+      become: yes
+
+    - name: Restart resolvconf
+      systemd:
+        name: resolvconf.service
+        state: restarted
+      become: yes
+
+    - name: Change OpenVPN install script permissions
+      file:
+        name: ovpn-ops/openvpn-install.sh
+        owner: root
+        group: root
+        mode: u=x
+      become: yes
+
+    - name: Launch OpenVPN install script
+      command: ./ovpn-ops/openvpn-install.sh
+      become: yes
+    
+    

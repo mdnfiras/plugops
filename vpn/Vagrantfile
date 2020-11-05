@@ -1,19 +1,20 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby:
 
-vpnscript = "initscripts/vpninstall.sh"
+provisionPath = "initscripts/ansible-vpn.yaml"
+testPath = "initscripts/test-vpn.sh"
 
 nodes = [
-	{:hostname => "vpn", :ip => "192.168.5.7", :cpus => 1, :mem => 512, :script => vpnscript}
+	{:hostname => "vpn", :ip => "192.168.5.7", :cpus => 1, :mem => 512, :provisionScript => provisionPath, :testScript => testPath}
 ]
 
 
 Vagrant.configure(2) do |config|
 	nodes.each do |node|
 		config.vm.define node[:hostname] do |vmachine|
-			config.vm.box_download_insecure = true
-			config.vm.box = "peru/ubuntu-18.04-server-amd64"
-			config.vm.box_check_update = false
+			vmachine.vm.box_download_insecure = true
+			vmachine.vm.box = "peru/ubuntu-18.04-server-amd64"
+			vmachine.vm.box_check_update = false
 			vmachine.vm.hostname = node[:hostname]
 			vmachine.vm.network "private_network", ip: node[:ip]
             vmachine.vm.network "forwarded_port", guest: 1194, host: 1194, host_ip: "192.168.1.27", protocol: "tcp"
@@ -21,7 +22,11 @@ Vagrant.configure(2) do |config|
 				domain.memory = node[:mem]
 				domain.cpus = node[:cpus]
 			end
-			vmachine.vm.provision :shell, path: node[:script]
+			wmachine.vm.provision :file, source: "ovpn-ops", destination: "ovpn-ops"
+			vmachine.vm.provision :ansible do |ansible|
+    			ansible.playbook =  node[:provisionScript]
+			end
+			vmachine.vm.provision :shell, path: node[:testScript]
 		end
 	end
 end
