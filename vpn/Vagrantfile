@@ -21,6 +21,8 @@ Vagrant.configure(2) do |config|
 			vmachine.vm.provider :libvirt do |domain|
 				domain.memory = node[:mem]
 				domain.cpus = node[:cpus]
+				domain.management_network_domain = "devopsnet"
+				domain.management_network_address = "10.20.30.0/24"
 			end
 			wmachine.vm.provision :file, source: "ovpn-ops", destination: "ovpn-ops"
 			vmachine.vm.provision :ansible do |ansible|
