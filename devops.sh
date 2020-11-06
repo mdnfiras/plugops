@@ -57,19 +57,20 @@ vagrant up --provider libvirt > nfs.logs
 cd ..
 exit
 
-echo "Running VPN server..."
-cd vpn
-vagrant up --provider libvirt > vpn.logs
-cd ..
+# echo "Running VPN server..."
+# cd vpn
+# vagrant up --provider libvirt > vpn.logs
+# cd ..
 
-
-echo "Running K8S cluster..."
 for (( i=1; i<=$K8S_N; i++ ))
 do
-    cd worker$i
-    vagrant up --provider libvirt > worker$i.logs &
-    cd ..
+  echo "Running k8s worker$i..."
+  cd worker$i
+  vagrant up --provider libvirt > worker$i.logs
+  cd ..
 done
+
+echo "Running k8s main..."
 cd main
 vagrant up --provider libvirt > main.logs
 cd ..
