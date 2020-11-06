@@ -34,7 +34,7 @@ echo "=======> installing package for NFS client :"
 apt install -y nfs-common
 
 echo "=======> waiting for NFS and DNS servers to be ready :"
-while [[ -z "$(showmount -e nfs.[[DOMAIN]] | grep /mnt/nfs_share/kubejoin )" ]]; do sleep 5 ; done
+while [[ -z "$(ping nfs.[[DOMAIN]] -c 1 | grep 0% )" ]]; do sleep 5; done
 
 echo "=======> mounting via NFS :"
 mkdir -p /mnt/nfs_k8s
