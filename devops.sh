@@ -55,7 +55,6 @@ echo "Running NFS server..."
 cd nfs
 vagrant up --provider libvirt > nfs.logs
 cd ..
-exit
 
 # echo "Running VPN server..."
 # cd vpn
@@ -66,7 +65,7 @@ for (( i=1; i<=$K8S_N; i++ ))
 do
   echo "Running k8s worker$i..."
   cd worker$i
-  vagrant up --provider libvirt > worker$i.logs
+  vagrant up --provider libvirt > worker$i.logs &
   cd ..
 done
 
