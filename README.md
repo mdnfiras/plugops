@@ -15,7 +15,7 @@ Cluster networking:		    Calico, Nginx Ingress Controller and MetalLB
 DevSecOps:				    Jenkins, Prometheus, Grafana, HuskyCI…
 
 
-<img src='readme/arch.png' width=700 style="display:inline-block">
+<img src='readme/arch.png' style="display:inline-block">
 
 # Installation
 
