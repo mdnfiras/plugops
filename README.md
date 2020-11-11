@@ -1,4 +1,4 @@
-# Automated DevOps environment deployment
+# Automatic deployment of a DevOps test environment
 
 Automated deployment of a virtualized DevOps test environment on a k8s cluster provisioned by Vagrant on a Ubuntu Server 18.04.
 
