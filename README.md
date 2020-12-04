@@ -17,28 +17,6 @@ Automatic deployment of a customized, containerized DevOps environment for testi
 Deployment example:
 <img src='readme/deployment.png' style="display:inline-block">
 
-# Installation
-
-Clone the repository.
-
-```bash
-git clone https://github.com/mdnfiras/k8s-devops-env.git
-```
-
-Change directory.
-
-```bash
-cd k8s-devops-env
-```
-
-Install Vagrant on the host server along with all the required packages and plugins (KVM & LibVirt).
-
-
-```bash
-sudo chmod u=x requirements.sh
-sudo ./requirements.sh
-```
-
 # Usage
 
 Documentation ongoing !
