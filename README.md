@@ -15,7 +15,7 @@ Automatic deployment of a customized, containerized DevOps environment for testi
 
 
 Deployment example:
-<img src='readme/arch.png' style="display:inline-block">
+<img src='readme/deployment.png' style="display:inline-block">
 
 # Installation
 
