@@ -1,20 +1,20 @@
 # Automatic deployment of a DevOps test environment
 
-Automated deployment of a virtualized DevOps test environment on a k8s cluster provisioned by Vagrant on a Ubuntu Server 18.04.
+Automatic deployment of a customized, containerized DevOps environment for testing applications.
 
-Tools:
+- Infrastructure provisioning on cloud & on premise.
 
-Infrastructure:				KVM, Vagrant and Ansible
+- Networks services management (DNS, NFS, VPN...).
 
-Network services:			Bind9, NFS Kernel Server, OpenVPN
+- DevSecOps toolchain deployment.
 
-Container Orchestration:	Kubernetes (Docker Engine)
+- Monitoring, logging and visualizing.
 
-Cluster networking:		    Calico, Nginx Ingress Controller and MetalLB
-
-DevSecOps:				    Jenkins, Prometheus, Grafana, HuskyCI…
+- Installation and management user interfaces (UI).
 
 
+
+Deployment example:
 <img src='readme/arch.png' style="display:inline-block">
 
 # Installation
